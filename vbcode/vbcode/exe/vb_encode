@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require 'vbcode'
+
+if ARGV.empty?
+  file = STDIN
+elsif ARGV.size == 1
+  file = open(ARGV[0])
+else
+  puts "Usage: #{File.basename(__FILE__)} <data_file>"
+  exit 1
+end
+
+file.each_line do |line|
+  tag, nums = line.split(/\t/)
+  pre = 0
+  vb = ''
+  nums.split(/,/).map{|s| s.to_i}.each do |num|
+    vb += VBCode.encode(num - pre)
+    pre = num
+  end
+  print [tag.bytesize, vb.size].pack("N2"), tag, vb
+end
+
+file.close

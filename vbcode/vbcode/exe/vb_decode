@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'vbcode'
+
+if ARGV.empty?
+  file = STDIN
+elsif ARGV.size == 1
+  file = open(ARGV[0])
+else
+  puts "Usage: #{File.basename(__FILE__)} <binay_file>"
+  exit 1
+end
+
+loop do
+  buf = file.read(8)
+  break if buf.nil?
+  tag_len, vb_len = buf.unpack('N2')
+  tag = file.read(tag_len)
+  nums = []
+  pre = 0
+  VBCode.decode(file.read(vb_len)).each do |num|
+    nums << num + pre
+    pre = num
+  end
+  puts "#{tag}\t#{nums.join(',')}"
+end
+
+file.close
+
